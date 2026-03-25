@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- SNS 공유 최적화 - '세대' 단어 완전 제거 -->
+    <!-- 카카오톡/SNS 공유 최적화 - '세대' 단어 배제 -->
     <meta property="og:title" content="가치관 진단도구">
     <meta property="og:description" content="20개 문항을 통해 당신의 업무 성향과 리더십 지표를 분석합니다.">
     <meta property="og:type" content="website">
@@ -149,7 +149,7 @@
 <body>
 
     <div id="app" class="max-w-5xl mx-auto px-4 py-8 md:py-16 w-full flex-grow">
-        <!-- 시작 화면 - 안내 문구 수정 완료 -->
+        <!-- 시작 화면 - 안내 문구 수정 (빅쌤 요청 반영) -->
         <div id="start-screen" class="glass-card p-10 md:p-20 text-center animate-in">
             <h1 class="text-3xl md:text-6xl font-black mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 leading-tight">
                 가치관 진단도구
@@ -174,7 +174,7 @@
 
             <div class="glass-card overflow-hidden">
                 <div id="question-container" class="animate-in">
-                    <!-- JS 렌더링 -->
+                    <!-- 질문 내용 주입 -->
                 </div>
                 
                 <div class="p-6 flex gap-4 bg-white/5">
@@ -188,9 +188,9 @@
         <div id="result-screen" class="hidden animate-in">
             <div class="glass-card p-10 text-center mb-8 border-t-4 border-purple-500">
                 <h2 class="text-slate-500 font-bold mb-3 uppercase tracking-widest text-sm">Diagnosis Result</h2>
-                <div id="result-title" class="text-3xl md:text-5xl font-black text-white mb-4">--</div>
+                <div id="result-title" class="text-2xl md:text-4xl font-black text-white mb-4">--</div>
                 <div class="text-6xl md:text-8xl font-black text-purple-400 mb-8" id="total-score">0점</div>
-                <p id="result-desc" class="text-slate-300 text-base md:text-xl leading-relaxed max-w-3xl mx-auto"></p>
+                <p id="result-desc" class="text-slate-300 text-sm md:text-lg leading-relaxed max-w-3xl mx-auto"></p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10" id="category-results"></div>
@@ -202,6 +202,7 @@
     <footer>Copyright 2026 LEARN & INSIGHT All Rights Reserved.</footer>
 
     <script>
+        // 문항 데이터: 이미지 원문 그대로 유지
         const questions = [
             { id: 1, a: "직장 근무연수가 얼마 안 되는 직원일지라도, 지적 능력과 학력을 인정하고 그에 상응하는 대우를 해줘야 한다.", b: "아무리 경력과 학벌이 좋더라도 직장에서는 동일한 조건에서 누구나 허드렛일부터 차근차근 배울 필요가 있다.", cat: "효능감 vs 의무감" },
             { id: 2, a: "일과시간 외 개인적 삶의 영역에 대해서는 가능한 본인이 통제할 수 있어야 한다.", b: "직장생활을 하다 보면 상황에 따라 조직을 위해 개인의 삶이 희생될 수밖에 없다고 생각한다.", cat: "효능감 vs 의무감" },
@@ -225,7 +226,7 @@
             { id: 20, a: "업무에 실수가 있더라도 인내심을 가지고 개선이 필요한 사항에 대해 직원이 이해하도록 구체적으로 피드백 해야 한다.", b: "업무에 실수가 있으면 조금 답답하더라도 직원 스스로 깨닫도록 도와야 한다.", cat: "칭찬 vs 지적" }
         ];
 
-        // 지표별 동적 피드백 데이터
+        // 지표별 동적 피드백 데이터 (A/B 점수 치우침에 따라 자동 변경)
         const catDescData = {
             "효능감 vs 의무감": {
                 a: "자신의 역량과 노력에 대한 인정을 중시하며, 의무보다는 스스로 느끼는 효능감을 업무의 원동력으로 삼습니다.",
@@ -361,21 +362,23 @@
             document.getElementById('total-score').innerText = `${totalScore}점`;
 
             let title, desc;
+            
+            // 점수 구간 로직 업데이트 (빅쌤 요청 반영)
             if (totalScore >= 80) { 
-                title = "A 가치관 우세 (혁신과 자율 지향)"; 
-                desc = "당신은 수평적 소통과 업무 효율성을 극도로 중시하며, 변화와 혁신을 조직의 핵심 동력으로 여깁니다. 전통적인 틀보다는 개인의 주체적인 효능감과 새로운 경험을 통해 업무 동기를 부여받는 성향이 매우 뚜렷합니다."; 
+                title = "A 가치관 지향 (혁신과 자율 중심)"; 
+                desc = "당신은 수평적 소통과 업무 효율성을 극도로 중시하며, 변화와 혁신을 조직의 핵심 원동력으로 여깁니다. 전통적인 틀이나 형식적인 절차에 얽매이기보다, 개인의 주체적인 효능감과 실질적인 성과를 통해 동기를 부여받는 성향이 매우 강력합니다. 디지털 전환과 급변하는 시장 환경에서 가장 빠르게 적응하고 새로운 가치를 창출하는 스타일입니다."; 
             }
             else if (totalScore >= 60) { 
                 title = "유연한 가치관 보유 (수용과 변화 지향)"; 
-                desc = "안정적인 질서를 존중하면서도 새로운 조직 문화적 흐름을 유연하게 수용할 준비가 되어 있습니다. 다양한 구성원 간 소통의 창구 역할을 수행하기에 최적화된 균형 잡힌 시각을 갖춘 성향입니다."; 
+                desc = "당신은 조직의 안정적인 질서를 존중하면서도 합리적인 변화의 필요성을 정확히 인지하고 있습니다. 새로운 가치관을 유연하게 수용할 준비가 되어 있으며, 고착화된 관행보다는 실무적인 개선을 선호합니다. 서로 다른 지향점을 가진 구성원들 사이에서 소통의 창구 역할을 수행하며 조직의 연착륙을 돕는 균형 잡힌 시각을 갖추고 있습니다."; 
             }
             else if (totalScore >= 40) { 
-                title = "실용적 가치관 보유 (조화와 실용 지향)"; 
-                desc = "전통적인 책임감과 효율적인 새로운 가치 사이에서 실용적인 균형을 찾고 있습니다. 서로 다른 가치관의 입장을 모두 이해하려 노력하며, 상황에 맞는 유연한 의사결정을 선호하는 조화로운 성향입니다."; 
+                title = "과도기적 가치관 (지향점의 정체 및 혼란)"; 
+                desc = "당신은 현재 전통적인 가치관의 안정감과 새로운 가치관의 효율성 사이에서 명확한 지향점을 설정하지 못한 상태입니다. 양쪽 가치의 장단점을 모두 알고는 있으나, 실제 의사결정 상황에서는 어느 한쪽의 원칙도 확고하게 세우지 못해 다소 모호한 태도를 보일 수 있습니다. 조직 내에서 자신만의 리더십 색깔을 잃고 상황에 따라 휩쓸리기 쉬운 지점이니, 본인이 추구할 핵심 가치를 명확히 정립할 필요가 있습니다."; 
             }
             else { 
-                title = "B 가치관 우세 (전통과 질서 지향)"; 
-                desc = "조직의 안정과 전통, 명확한 체계와 책임감을 최고의 미덕으로 생각합니다. 조직 구성원들을 하나로 결집시키는 힘이 있으며, 오랜 시간 검증된 원칙과 질서가 주는 안정된 가치를 신뢰하는 성향이 강합니다."; 
+                title = "B 가치관 지향 (전통과 질서 중심)"; 
+                desc = "당신은 조직의 안정과 검증된 원칙, 명확한 체계와 책임감을 최고의 미덕으로 생각합니다. 오랜 시간 조직을 지탱해온 질서와 전통이 주는 가치를 신뢰하며, 개인의 자율보다는 집단의 응집력과 소속감을 우선하는 경향이 뚜렷합니다. 헌신적인 태도로 조직의 근간을 지키는 힘이 있으나, 변화에 대한 보수적인 태도가 새로운 흐름과의 단절을 야기할 수 있음을 인지해야 합니다."; 
             }
 
             document.getElementById('result-title').innerText = title;
