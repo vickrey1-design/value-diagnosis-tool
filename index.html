@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- 카카오톡/SNS 공유 시 '세대' 단어 노출 방지 처리 -->
+    <meta property="og:title" content="가치관 진단도구">
+    <meta property="og:description" content="20개 문항을 통해 당신의 업무 성향과 리더십 지표를 분석합니다.">
+    <meta property="og:type" content="website">
+    
+    <title>가치관 진단도구</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap');
+
+        :root {
+            --primary: #8b5cf6;
+            --secondary: #3b82f6;
+            --bg-dark: #0f172a;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            margin: 0; padding: 0;
+            overflow-x: hidden;
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.25rem;
+        }
+
+        /* 라디오 버튼 디자인 */
+        .radio-group input[type="radio"] { display: none; }
+        .radio-group {
+            display: flex;
+            flex-direction: row;
+            gap: clamp(4px, 1vw, 12px);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .radio-group label {
+            width: clamp(34px, 8vw, 46px);
+            height: clamp(34px, 8vw, 46px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: clamp(0.75rem, 2vw, 0.95rem);
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.05);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .radio-group input[type="radio"]:checked + label {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 0 15px var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* 레이아웃: 기본 3단, 모바일은 1단 세로 배치 */
+        .question-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr; 
+            gap: 2rem;
+            align-items: center;
+            padding: 3rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 250px;
+        }
+
+        @media (max-width: 768px) {
+            .question-row {
+                grid-template-columns: 1fr; 
+                gap: 1.5rem;
+                padding: 2rem 1rem;
+                text-align: center;
+                min-height: auto;
+            }
+            .option-text.text-right { text-align: center; }
+            .center-controls { order: 2; margin: 0.5rem 0; }
+            .option-a { order: 1; }
+            .option-b { order: 3; }
+        }
+
+        .option-text {
+            font-size: clamp(0.95rem, 3vw, 1.15rem);
+            line-height: 1.6;
+            word-break: keep-all;
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        .center-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .indicator-label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .category-card {
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 1rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+
+        footer {
+            margin-top: auto;
+            padding: 2.5rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" class="max-w-5xl mx-auto px-4 py-8 md:py-16 w-full flex-grow">
+        <!-- 시작 화면 -->
+        <div id="start-screen" class="glass-card p-10 md:p-20 text-center animate-in">
+            <h1 class="text-3xl md:text-6xl font-black mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 leading-tight">
+                가치관 진단도구
+            </h1>
+            <p class="text-slate-400 text-base md:text-xl mb-12 leading-relaxed max-w-2xl mx-auto">
+                20개 문항을 통해 당신의 업무 성향과 리더십 지표를 분석합니다.<br>
+                자신에게 더 가까운 가치관을 선택해 주세요.
+            </p>
+            <button onclick="startTest()" class="w-full md:w-auto bg-gradient-to-r from-purple-600 to-blue-600 px-12 py-5 rounded-full text-xl font-bold text-white shadow-2xl active:scale-95 transition-all">
+                진단 시작하기
+            </button>
+        </div>
+
+        <!-- 진단 화면 -->
+        <div id="survey-screen" class="hidden">
+            <div class="flex justify-between items-end mb-6 px-2">
+                <div class="text-purple-400 font-extrabold text-xl" id="q-number">01 / 20</div>
+                <div class="w-2/3 bg-white/10 h-2 rounded-full overflow-hidden">
+                    <div id="progress-fill" class="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-700" style="width: 5%"></div>
+                </div>
+            </div>
+
+            <div class="glass-card overflow-hidden">
+                <div id="question-container" class="animate-in">
+                    <!-- JS 렌더링 -->
+                </div>
+                
+                <div class="p-6 flex gap-4 bg-white/5">
+                    <button id="prev-btn" onclick="prevQuestion()" class="flex-1 py-4 rounded-2xl bg-white/10 text-white font-bold disabled:opacity-20 transition-all">이전</button>
+                    <button id="next-btn" onclick="nextQuestion()" class="flex-[2] py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold shadow-lg active:scale-95 transition-all">다음 문항</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result-screen" class="hidden animate-in">
+            <div class="glass-card p-10 text-center mb-8 border-t-4 border-purple-500">
+                <h2 class="text-slate-500 font-bold mb-3 uppercase tracking-widest text-sm">Diagnosis Result</h2>
+                <div id="result-title" class="text-3xl md:text-5xl font-black text-white mb-4">--</div>
+                <div class="text-6xl md:text-8xl font-black text-purple-400 mb-8" id="total-score">0점</div>
+                <p id="result-desc" class="text-slate-300 text-base md:text-xl leading-relaxed max-w-3xl mx-auto"></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10" id="category-results"></div>
+
+            <button onclick="location.reload()" class="w-full py-5 rounded-2xl bg-white/10 text-white font-bold border border-white/10 hover:bg-white/20 transition-all">진단 다시 하기</button>
+        </div>
+    </div>
+
+    <footer>Copyright 2026 LEARN & INSIGHT All Rights Reserved.</footer>
+
+    <script>
+        // 문항 데이터: 빅쌤이 주신 이미지 원문을 100% 동일하게 유지합니다.
+        const questions = [
+            { id: 1, a: "직장 근무연수가 얼마 안 되는 직원일지라도, 지적 능력과 학력을 인정하고 그에 상응하는 대우를 해줘야 한다.", b: "아무리 경력과 학벌이 좋더라도 직장에서는 동일한 조건에서 누구나 허드렛일부터 차근차근 배울 필요가 있다.", cat: "효능감" },
+            { id: 2, a: "일과시간 외 개인적 삶의 영역에 대해서는 가능한 본인이 통제할 수 있어야 한다.", b: "직장생활을 하다 보면 상황에 따라 조직을 위해 개인의 삶이 희생될 수밖에 없다고 생각한다.", cat: "효능감" },
+            { id: 3, a: "젊고 능력 있다면 나이나 기수와 상관없이 언제든 승진 가능해야 한다.", b: "아무리 능력이 있어도 인사고과 시 연령이나 기수가 높은 사람이 먼저 승진하도록 도와주는 게 순리다.", cat: "평등주의" },
+            { id: 4, a: "조직 운영에 위계질서와 권위는 장애가 된다.", b: "조직운영에는 위계질서와 권위가 중요하다.", cat: "평등주의" },
+            { id: 5, a: "일하다가 부하직원이 실수하거나 잘못할 경우, 상사가 이를 도와서 잘 마무리 하면 된다.", b: "직장에서는 자신이 맡은 일은 기본적으로 스스로 꼼꼼하게 잘 마무리할 수 있어야 한다.", cat: "협력의식" },
+            { id: 6, a: "스스로 작업한 보고서에 오탈자가 조금 있더라도 관리자의 승인 없이 고객에게 전달될 수 있다.", b: "고객에게 전달되는 보고서는 회사 이름으로 나가는 것이므로, 관리자가 오탈자가 잘 검수해서 내보내야 한다.", cat: "협력의식" },
+            { id: 7, a: "회사에서 인간관계를 내 삶과 별개로 분리하고, 일을 위해 필요한 수준으로 협력관계를 관리하는 것이 자연스럽다.", b: "회사에서 구성원들과 인간적으로 끈끈한 관계를 유지하고, 삶의 연장선상에서 비공식적 채널을 통해 그들과 소통하는 것이 자연스럽다.", cat: "업무중심" },
+            { id: 8, a: "직장에서의 성공은 능력에 좌우되며, 관계 구축은 일하는 데 선택 가능한 선택지 중 하나일 뿐이다.", b: "직장에서 성공하려면 직장에서의 인적 관계 구축 및 관리가 필수적인 요소라고 생각한다.", cat: "업무중심" },
+            { id: 9, a: "조직을 유지하는 전통을 지키는 것도 중요하지만 환경 변화에 맞춰 조직을 바꾸는 것이 더 중요하다.", b: "변화도 중요하지만 지금의 조직을 있게 한 전통을 잘 지키는 일이 더 중요하다.", cat: "변화" },
+            { id: 10, a: "리스크를 감수하더라도 지속적으로 변화를 도모할 필요가 있다.", b: "도전적으로 변화를 꾀하기보다는 장점을 살려 잘 하는 것이 더 중요하다.", cat: "변화" },
+            { id: 11, a: "미래를 준비하기 위해 현재의 행복을 희생하는 것 보다는 지금 더 경험하고 즐기는 것이 좋다.", b: "불편을 감수하더라도 지금 더 참고 절약해서 미래를 준비하는 편이 낫다.", cat: "경험" },
+            { id: 12, a: "내 집은 필수사항이 아니며 임대해서 사는 것이 현명하다.", b: "내 집은 필수사항이므로 되도록 내 소유의 집이 있어야 한다.", cat: "경험" },
+            { id: 13, a: "개인사정에 따라 회식이나 단체 행사에 얼마든지 빠질 수 있다.", b: "직장인이라면 회식도 업무의 연장이므로 되도록 참석해야 한다.", cat: "개인성" },
+            { id: 14, a: "직장생활을 하더라도 개인의 삶이 더 중요하다.", b: "직장생활을 하는 이상 개인의 삶도 중요하지만 조직이 우선이다.", cat: "개인성" },
+            { id: 15, a: "신입직원이라 할지라도 업무를 수행하는 데 일의 목적과 큰 그림을 먼저 알 필요가 있다.", b: "부하직원 입장에서는 선배 직원이 시키는 일은 그 목적이나 이유를 따지기 전에 일단 수행하는 것이 맞다.", cat: "설명" },
+            { id: 16, a: "업무지시를 할 때는 되도록 친절하고 구체적으로 내용을 전달해야 한다.", b: "부하직원이 스스로 일의 맥락을 파악하도록 어렴풋하더라도 방향성만 제시하면 된다.", cat: "설명" },
+            { id: 17, a: "직장생활에서 혈연, 학연, 지연 보다는 능력이 더 중요하다.", b: "직장생활에서 능력도 중요하지만 혈연, 학연, 지연은 무시할 수 없다.", cat: "능력주의" },
+            { id: 18, a: "직장에서 출신학교 동문 모임이 생기더라도 꼭 참석할 필요는 없다.", b: "직장에서 출신학교 동문 모임이 생기면 적극적으로 참여할 의향이 있다.", cat: "능력주의" },
+            { id: 19, a: "부하직원의 동기부여를 위해 질책보다는 가능한 잘한 일을 칭찬해야 한다.", b: "항상 잘한 점을 칭찬하기보다는 때로 강한 피드백과 질책이 직원을 성장시키는 데 효과적이다.", cat: "칭찬" },
+            { id: 20, a: "업무에 실수가 있더라도 인내심을 가지고 개선이 필요한 사항에 대해 직원이 이해하도록 구체적으로 피드백 해야 한다.", b: "업무에 실수가 있으면 조금 답답하더라도 직원 스스로 깨닫도록 도와야 한다.", cat: "칭찬" }
+        ];
+
+        // 지표별 설명 (이곳에서도 '세대' 단어를 제거했습니다)
+        const catDesc = {
+            "효능감": "개인의 역량 인정과 성과에 대한 실질적인 보람을 중시합니다.",
+            "평등주의": "수평적인 기회와 능력 기반의 공정한 대우를 지향합니다.",
+            "협력의식": "일방적 책임보다 상호 보완적인 소통과 업무의 완성을 중시합니다.",
+            "업무중심": "사적인 네트워크보다 전문성과 효율적인 과업 수행을 선호합니다.",
+            "변화": "과거의 성공 방식에 안주하기보다 혁신과 환경 적응을 우선시합니다.",
+            "경험": "소유와 축적보다 현재의 가치 있는 경험과 삶의 만족을 중시합니다.",
+            "개인성": "조직의 명분보다 개인의 자율성과 주체적인 선택을 존중합니다.",
+            "설명": "무조건적인 실행보다 업무의 목적과 맥락에 대한 공유를 요구합니다.",
+            "능력주의": "연고나 인맥보다 실질적인 실력과 투명한 평가를 신뢰합니다.",
+            "칭찬": "지적보다 긍정적인 강화와 격려를 통한 성장을 선호합니다."
+        };
+
+        let currentIdx = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+
+        function startTest() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('survey-screen').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentIdx];
+            document.getElementById('q-number').innerText = `${String(q.id).padStart(2, '0')} / 20`;
+            document.getElementById('progress-fill').style.width = `${((currentIdx + 1) / questions.length) * 100}%`;
+            document.getElementById('prev-btn').disabled = currentIdx === 0;
+            document.getElementById('next-btn').innerText = currentIdx === questions.length - 1 ? "결과 확인하기" : "다음 문항";
+
+            document.getElementById('question-container').innerHTML = `
+                <div class="question-row">
+                    <div class="option-a option-text text-left">
+                        ${q.a} (A)
+                    </div>
+                    
+                    <div class="center-controls">
+                        <div class="flex items-center justify-center gap-3">
+                            <span class="indicator-label text-purple-400">A 성향</span>
+                            <div class="radio-group">
+                                ${['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ'].map((val, idx) => `
+                                    <div>
+                                        <input type="radio" name="q-${q.id}" id="opt-${idx}" value="${5 - idx}" 
+                                            ${userAnswers[currentIdx] == (5 - idx) ? 'checked' : ''} 
+                                            onchange="saveAnswer(${5 - idx})">
+                                        <label for="opt-${idx}">${val}</label>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <span class="indicator-label text-blue-400">B 성향</span>
+                        </div>
+                    </div>
+
+                    <div class="option-b option-text text-right">
+                        ${q.b} (B)
+                    </div>
+                </div>
+            `;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function saveAnswer(val) {
+            userAnswers[currentIdx] = val;
+        }
+
+        function nextQuestion() {
+            if (userAnswers[currentIdx] === null) {
+                const toast = document.createElement('div');
+                toast.className = "fixed top-12 left-1/2 -translate-x-1/2 bg-red-600 text-white px-8 py-4 rounded-full shadow-2xl z-50 text-sm font-bold animate-bounce";
+                toast.innerText = "항목을 선택해 주세요!";
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 2500);
+                return;
+            }
+            if (currentIdx < questions.length - 1) {
+                currentIdx++;
+                renderQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                renderQuestion();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('survey-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            window.scrollTo(0, 0);
+
+            const totalScore = userAnswers.reduce((acc, cur) => acc + cur, 0);
+            document.getElementById('total-score').innerText = `${totalScore}점`;
+
+            let title, desc;
+            // 결과 해석 멘트에서 '세대' 단어를 완전히 제거하고 가치관 중심으로 재설계했습니다.
+            if (totalScore >= 80) { 
+                title = "A 가치관 우세 (혁신과 자율 지향)"; 
+                desc = "당신은 수평적 소통과 업무 효율성을 극도로 중시하며, 변화와 혁신을 조직의 핵심 원동력으로 여깁니다. 전통적인 방식보다는 개인의 주체적인 효능감과 새로운 경험을 통해 업무 동기를 부여받는 성향이 매우 뚜렷합니다."; 
+            }
+            else if (totalScore >= 60) { 
+                title = "유연한 가치관 보유 (수용과 변화 지향)"; 
+                desc = "안정적인 질서를 존중하면서도 새로운 조직 문화적 흐름을 유연하게 수용할 준비가 되어 있습니다. 다양한 구성원 간 소통의 창구 역할을 수행하기에 최적화된 균형 잡힌 시각을 갖춘 성향입니다."; 
+            }
+            else if (totalScore >= 40) { 
+                title = "실용적 가치관 보유 (조화와 실용 지향)"; 
+                desc = "전통적인 책임감과 효율적인 새로운 가치 사이에서 실용적인 균형을 찾고 있습니다. 서로 다른 가치관의 입장을 모두 이해하려 노력하며, 상황에 맞는 유연한 의사결정을 선호하는 조화로운 성향입니다."; 
+            }
+            else { 
+                title = "B 가치관 우세 (전통과 질서 지향)"; 
+                desc = "조직의 안정과 전통, 명확한 체계와 책임감을 최고의 미덕으로 생각합니다. 조직 구성원들을 하나로 결집시키는 힘이 있으며, 오랜 시간 검증된 원칙과 질서가 주는 안정된 가치를 신뢰하는 성향이 강합니다."; 
+            }
+
+            document.getElementById('result-title').innerText = title;
+            document.getElementById('result-desc').innerText = desc;
+
+            const catGrid = document.getElementById('category-results');
+            catGrid.innerHTML = "";
+            const categories = [...new Set(questions.map(q => q.cat))];
+            categories.forEach(cat => {
+                const catQuestions = questions.filter(q => q.cat === cat);
+                const score = catQuestions.reduce((acc, q) => acc + userAnswers[q.id - 1], 0);
+                const avg = score / 2;
+                const card = document.createElement('div');
+                card.className = "category-card animate-in";
+                card.innerHTML = `
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-white text-lg">${cat}</span>
+                        <span class="text-sm font-bold text-purple-400">${avg.toFixed(1)} / 5.0</span>
+                    </div>
+                    <p class="text-xs text-slate-500 leading-relaxed mb-4">${catDesc[cat]}</p>
+                    <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-purple-500 to-blue-500" style="width: ${avg * 20}%"></div>
+                    </div>
+                `;
+                catGrid.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
