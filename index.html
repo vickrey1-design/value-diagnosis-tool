@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <!-- SNS 공유 최적화 -->
+    <!-- SNS 공유 최적화 - '세대' 단어 배제 -->
     <meta property="og:title" content="가치관 진단도구">
     <meta property="og:description" content="20개 문항을 통해 당신의 업무 성향과 리더십 지표를 분석합니다.">
     <meta property="og:type" content="website">
@@ -42,6 +42,7 @@
             border-radius: 1.25rem;
         }
 
+        /* 라디오 버튼 디자인 */
         .radio-group input[type="radio"] { display: none; }
         .radio-group {
             display: flex;
@@ -75,6 +76,7 @@
             transform: scale(1.1);
         }
 
+        /* 레이아웃: 기본 3단, 모바일은 1단 세로 배치 */
         .question-row {
             display: grid;
             grid-template-columns: 1fr auto 1fr; 
@@ -163,11 +165,12 @@
 <body>
 
     <div id="app" class="max-w-5xl mx-auto px-4 py-8 md:py-16 w-full flex-grow">
+        <!-- 시작 화면 - 모바일 전용 왼쪽 정렬(text-left md:text-center) 적용 -->
         <div id="start-screen" class="glass-card p-10 md:p-20 text-center animate-in">
             <h1 class="text-3xl md:text-6xl font-black mb-8 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400 leading-tight">
                 가치관 진단도구
             </h1>
-            <p class="text-slate-400 text-base md:text-xl mb-12 leading-relaxed max-w-2xl mx-auto">
+            <p class="text-slate-400 text-base md:text-xl mb-12 leading-relaxed max-w-2xl mx-auto text-left md:text-center">
                 20개 문항을 통해 다양한 관점에서의 나의 가치관 지향성을 확인할 수 있습니다.<br>
                 자신에게 더 가까운 가치관을 선택해 주세요.
             </p>
@@ -218,13 +221,14 @@
     <footer>Copyright 2026 LEARN & INSIGHT All Rights Reserved.</footer>
 
     <script>
+        // 20개 문항 원문 (지표 키워드 포함)
         const questions = [
             { id: 1, a: "직장 근무연수가 얼마 안 되는 직원일지라도, 지적 능력과 학력을 인정하고 그에 상응하는 대우를 해줘야 한다.", b: "아무리 경력과 학벌이 좋더라도 직장에서는 동일한 조건에서 누구나 허드렛일부터 차근차근 배울 필요가 있다.", cat: "효능감 vs 의무감", label: "효능감" },
             { id: 2, a: "일과시간 외 개인적 삶의 영역에 대해서는 가능한 본인이 통제할 수 있어야 한다.", b: "직장생활을 하다 보면 상황에 따라 조직을 위해 개인의 삶이 희생될 수밖에 없다고 생각한다.", cat: "효능감 vs 의무감", label: "의무감" },
             { id: 3, a: "젊고 능력 있다면 나이나 기수와 상관없이 언제든 승진 가능해야 한다.", b: "아무리 능력이 있어도 인사고과 시 연령이나 기수가 높은 사람이 먼저 승진하도록 도와주는 게 순리다.", cat: "평등주의 vs 서열주의", label: "평등주의" },
             { id: 4, a: "조직 운영에 위계질서와 권위는 장애가 된다.", b: "조직운영에는 위계질서와 권위가 중요하다.", cat: "평등주의 vs 서열주의", label: "서열주의" },
             { id: 5, a: "일하다가 부하직원이 실수하거나 잘못할 경우, 상사가 이를 도와서 잘 마무리 하면 된다.", b: "직장에서는 자신이 맡은 일은 기본적으로 스스로 꼼꼼하게 잘 마무리할 수 있어야 한다.", cat: "협력의식 vs 주인의식", label: "협력의식" },
-            { id: 6, a: "스스로 작업한 보고서에 오탈자가 조금 있더라도 관리자의 승인 없이 고객에게 전달될 수 있다.", b: "고객에게 전달되는 보고서는 회사 이름으로 나가는 것이므로, 관리자가 오탈자가 잘 검수해서 내보내야 한다.", cat: "협력의식 vs 주인의식", label: "주인의식" },
+            { id: 6, a: "스스로 작업한 보고서에 오탈자가 조금 있더라도 관리자의 승인 없이 고객에게 전달될 수 있다.", b: "고객에게 전달되는 보고서는 회사 이름으로 나가는 것이므로, 관리자가 오탈자를 잘 검수해서 내보내야 한다.", cat: "협력의식 vs 주인의식", label: "주인의식" },
             { id: 7, a: "회사에서 인간관계를 내 삶과 별개로 분리하고, 일을 위해 필요한 수준으로 협력관계를 관리하는 것이 자연스럽다.", b: "회사에서 구성원들과 인간적으로 끈끈한 관계를 유지하고, 삶의 연장선상에서 비공식적 채널을 통해 그들과 소통하는 것이 자연스럽다.", cat: "업무중심 vs 관계중심", label: "업무중심" },
             { id: 8, a: "직장에서의 성공은 능력에 좌우되며, 관계 구축은 일하는 데 선택 가능한 선택지 중 하나일 뿐이다.", b: "직장에서 성공하려면 직장에서의 인적 관계 구축 및 관리가 필수적인 요소라고 생각한다.", cat: "업무중심 vs 관계중심", label: "관계중심" },
             { id: 9, a: "조직을 유지하는 전통을 지키는 것도 중요하지만 환경 변화에 맞춰 조직을 바꾸는 것이 더 중요하다.", b: "변화도 중요하지만 지금의 조직을 있게 한 전통을 잘 지키는 일이 더 중요하다.", cat: "변화 vs 안정", label: "변화" },
@@ -241,8 +245,9 @@
             { id: 20, a: "업무에 실수가 있더라도 인내심을 가지고 개선이 필요한 사항에 대해 직원이 이해하도록 구체적으로 피드백 해야 한다.", b: "업무에 실수가 있으면 조금 답답하더라도 직원 스스로 깨닫도록 도와야 한다.", cat: "칭찬 vs 지적", label: "지적" }
         ];
 
+        // 지표별 동적 해석 데이터
         const catDescData = {
-            "효능감 vs 의무감": { a: "자신의 역량과 노력에 대한 인정을 중시하며 효능감을 업무의 원동력으로 삼습니다.", b: "조직 구성원으로서의 책임감과 맡은 바 소임을 다하는 의무감을 우선시합니다.", neutral: "개인의 효능감과 조직에 대한 의무감 사이에서 적절한 균형을 유지하고 있습니다." },
+            "효능감 vs 의무감": { a: "자신의 역량과 노력에 대한 인정을 중시하며 효능감을 업무의 원동력으로 삼습니다.", b: "조직 구성원으로서의 책임감과 맡은 바 소임을 다하는 의무감을 우선시합니다.", neutral: "개인의 효능감과 조직에 대한 의무감 사이에서 균형을 유지하고 있습니다." },
             "평등주의 vs 서열주의": { a: "나이나 기수보다 실력을 우선시하며 수평적이고 평등한 소통 문화를 선호합니다.", b: "조직 내 검증된 위계와 서열의 중요성을 인정하며 안정적인 질서를 중시합니다.", neutral: "수평적 평등과 수직적 질서의 필요성을 동시에 인정하며 조화로운 태도를 보입니다." },
             "협력의식 vs 주인의식": { a: "일방적 지시보다 상호 보완적인 협력과 소통을 통한 과업 완결을 가치 있게 생각합니다.", b: "자신이 맡은 일은 스스로 완벽하게 책임지고 마무리하려는 주체성을 지향합니다.", neutral: "팀워크를 통한 협력과 개별적인 책임 완수 사이에서 중립적인 성향을 보입니다." },
             "업무중심 vs 관계중심": { a: "인적 네트워크 관리보다 업무 자체의 효율과 성과 창출을 최우선으로 생각합니다.", b: "조직 내 끈끈한 유대감과 관계 구축이 업무 성공의 핵심이라 믿습니다.", neutral: "성과를 위한 과업 집중력과 구성원과의 관계 유지 능력을 고루 갖추려 노력합니다." },
@@ -348,7 +353,6 @@
                 catGrid.appendChild(card);
             });
 
-            // 나의 응답 상세 복기 생성 (문항별 개별 지표명 추가 수정됨)
             const historyContainer = document.getElementById('detailed-history');
             historyContainer.innerHTML = "";
             const scoreToSymbol = { 5: 'ㄱ', 4: 'ㄴ', 3: 'ㄷ', 2: 'ㄹ', 1: 'ㅁ' };
